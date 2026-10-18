@@ -1,0 +1,7 @@
+{
+  "runtime": {
+    "profile": "sdk",
+    "provider": "deepseek-official",
+    "model": "deepseek-v4-flash"
+  }
+}

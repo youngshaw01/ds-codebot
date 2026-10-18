@@ -1,0 +1,28 @@
+{
+  "name": "ds-codebot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Coding bot framework driven by deepseek-harness over the SDK protocol",
+  "engines": {
+    "node": "^22.19 || >=24"
+  },
+  "bin": {
+    "ds-codebot": "src/index.ts"
+  },
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx/esm --test tests/config.spec.ts tests/errors.spec.ts tests/e2e.spec.ts"
+  },
+  "dependencies": {
+    "@deepseek-ai/dsh-llm": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-sdk-client": "0.2.1-rc.2"
+  },
+  "devDependencies": {
+    "@deepseek-ai/dsh": "0.2.1-rc.2",
+    "@types/node": "^22.15.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.9.0"
+  }
+}

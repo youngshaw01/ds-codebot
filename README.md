@@ -30,7 +30,15 @@
 
 ## 快速开始
 
-M1 可运行版本完成后补充。
+```sh
+npm install
+export DEEPSEEK_API_KEY=<你的 key>   # 仅真实模型调用需要；启动与握手不需要
+npm start                            # 等价 npx tsx src/index.ts
+```
+
+启动后输入任务回车，等待回复；空行或 Ctrl-C 退出。`--config=<路径>` 指定配置文件（默认 `ds-codebot.config.json`）。
+
+当前进度：M1 driver 已完成（见 [.harness/milestones/M1-review.md](.harness/milestones/M1-review.md)），M2 TUI 未开始。
 
 ## 开发
 

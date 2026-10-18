@@ -30,7 +30,7 @@
 
 ## 提交
 
-- commit message 用 `type: 摘要`（type ∈ docs/feat/fix/chore/refactor/test）；一个提交一件事；推送前本地 `pnpm test`（若存在）通过。
+- commit message 用 `type: 摘要`（type ∈ docs/feat/fix/chore/refactor/test）；一个提交一件事；推送前本地 `npm run typecheck && npm test` 通过。
 
 ## 文档
 
