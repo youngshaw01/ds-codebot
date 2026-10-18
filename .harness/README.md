@@ -5,6 +5,10 @@
 | 文档 | 内容 |
 |---|---|
 | [DESIGN.md](DESIGN.md) | 详细设计：架构、目录结构、核心模块、协议约束、配置、里程碑、测试策略 |
+| [decisions/README.md](decisions/README.md) | 决策记录规则：何时写、格式、生命周期 |
+| [decisions/2026-10-18-sdk-first-architecture.md](decisions/2026-10-18-sdk-first-architecture.md) | 已接受：进程外 SDK 驱动架构（含放弃项与代价） |
+
+仓库级常驻规则见根目录 [AGENTS.md](../AGENTS.md)。
 
 ## 约定
 
