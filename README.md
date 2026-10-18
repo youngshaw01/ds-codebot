@@ -38,7 +38,13 @@ npm start                            # 等价 npx tsx src/index.ts
 
 启动后输入任务回车，等待回复；空行或 Ctrl-C 退出。`--config=<路径>` 指定配置文件（默认 `ds-codebot.config.json`）。
 
-当前进度：M1 driver 已完成（见 [.harness/milestones/M1-review.md](.harness/milestones/M1-review.md)），M2 TUI 未开始。
+TUI 模式（ink 全屏界面，工具调用实时可见、`/cwd` 切目录、状态栏显示运行状态）：
+
+```sh
+npm run tui    # 需要真实 TTY 终端；管道/CI 环境会 fail-loud 并指引回 CLI 模式
+```
+
+当前进度：M1 driver、M2 TUI 已完成（复盘见 `.harness/milestones/`），M3 飞书未开始。
 
 ## 开发
 

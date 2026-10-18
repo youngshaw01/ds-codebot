@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { DeepSeekHarness, type RunResult } from '@deepseek-ai/dsh-sdk-client'
+import { DeepSeekHarness, type HarnessNotification, type RunResult } from '@deepseek-ai/dsh-sdk-client'
 import type { RuntimeConfig } from '../config.ts'
 import { BotError, toBotError } from './errors.ts'
 
@@ -26,6 +26,10 @@ function countTools(events: RunResult['events']): { count: number; names: string
  */
 export class RuntimePool {
   readonly sessionId: string
+  /** 本池驱动 agent 所用的模型标识（状态栏展示用）。 */
+  get modelId(): string {
+    return this.config.model
+  }
   #harness: DeepSeekHarness | null = null
   #starting: Promise<void> | null = null
   #closed = false
@@ -76,6 +80,41 @@ export class RuntimePool {
       return { sessionId: result.sessionId, finalResponse: result.finalResponse, toolCallCount: count, toolNames: names }
     } catch (error) {
       throw toBotError(error)
+    }
+  }
+
+  /** 修改本 session 的有效工作目录（DESIGN.md M2 的 /cwd）；返回校验后的绝对路径。 */
+  async setCwd(path: string): Promise<string> {
+    await this.start()
+    const harness = this.#harness
+    if (!harness) throw new BotError('transport', '运行时未启动')
+    try {
+      return await harness.session(this.sessionId).setWorkingDirectory(path)
+    } catch (error) {
+      throw toBotError(error)
+    }
+  }
+
+  /**
+   * 订阅本 session（含已发现子代理）的 wire 通知，交给 handler 分发。
+   * 运行时只推全局流，session 树过滤由 client 完成（DESIGN.md §4.3）。
+   * @returns 退订函数。
+   */
+  subscribeSession(handler: (notification: HarnessNotification) => void): () => void {
+    const harness = this.#harness
+    if (!harness) throw new BotError('transport', '运行时未启动，先调用 start()')
+    const subscription = harness.client.subscribeSessionTree(this.sessionId)
+    let active = true
+    // 运行时会话结束后迭代自然结束/拒绝：此处只是结束循环，不向调用方抛错
+    void (async () => {
+      for await (const notification of subscription) {
+        if (!active) break
+        handler(notification)
+      }
+    })().catch(() => undefined)
+    return () => {
+      active = false
+      subscription.close()
     }
   }
 

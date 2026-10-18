@@ -3,3 +3,8 @@ state/
 *.log
 .env
 .env.*
+# 冒烟测试临时输出（内容已阅，可安全手动删除）
+out.txt
+err.txt
+tui-out.txt
+tui-err.txt

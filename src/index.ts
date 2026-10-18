@@ -16,7 +16,12 @@ function parseConfigPath(argv: string[]): string {
 }
 
 async function main(): Promise<void> {
-  const configPath = parseConfigPath(process.argv.slice(2))
+  const argv = process.argv.slice(2)
+  if (argv[0] === 'tui') {
+    await import('./frontends/tui/main.tsx')
+    return // TUI 自行管理进程生命周期（waitUntilExit 后退出）
+  }
+  const configPath = parseConfigPath(argv)
   const { runtime } = await loadConfig(configPath)
   const pool = new RuntimePool(runtime)
 
