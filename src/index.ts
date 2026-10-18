@@ -71,7 +71,8 @@ async function main(): Promise<void> {
     }
     turn(text)
   })
-  rl.on('close', () => void shutdown(0))
+  // EOF/空行退出：先排空已排队的所有 turn 再关闭，管道输入不得丢任务
+  rl.on('close', () => void queue.then(() => shutdown(0)))
 }
 
 main().catch((error: unknown) => {
