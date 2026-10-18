@@ -21,6 +21,10 @@ async function main(): Promise<void> {
     await import('./frontends/tui/main.tsx')
     return // TUI 自行管理进程生命周期（waitUntilExit 后退出）
   }
+  if (argv[0] === 'feishu') {
+    await import('./frontends/feishu/main.ts')
+    return
+  }
   const configPath = parseConfigPath(argv)
   const { runtime } = await loadConfig(configPath)
   const pool = new RuntimePool(runtime)

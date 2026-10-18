@@ -44,7 +44,18 @@ TUI 模式（ink 全屏界面，工具调用实时可见、`/cwd` 切目录、�
 npm run tui    # 需要真实 TTY 终端；管道/CI 环境会 fail-loud 并指引回 CLI 模式
 ```
 
-当前进度：M1 driver、M2 TUI 已完成（复盘见 `.harness/milestones/`），M3 飞书未开始。
+当前进度：M1 driver、M2 TUI 已完成，M3 飞书 bot 代码与内部验证完成（真实飞书租户联调待凭据），复盘见 `.harness/milestones/`。
+
+### 飞书 bot
+
+```sh
+export FEISHU_APP_ID=<飞书应用 App ID>       # 只走环境变量
+export FEISHU_APP_SECRET=<飞书应用 App Secret>
+export DEEPSEEK_API_KEY=<你的 key>
+npm run feishu
+```
+
+前置：飞书开放平台创建企业自建应用 → 启用「机器人」→ 订阅 `im.message.receive_v1` 事件（长连接模式）→ 申请 `im:message` 发送权限。群内 @bot 或私聊发送任务；`/cwd <目录>` 切换工作目录，`/new` 重置会话，`/help` 帮助。会话映射持久化在 `state/feishu-registry.json`，重启后续聊。
 
 ## 开发
 

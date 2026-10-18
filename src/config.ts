@@ -23,6 +23,11 @@ export interface RuntimeConfig {
 /** ds-codebot 配置文件结构。 */
 export interface BotConfig {
   runtime: RuntimeConfig
+  /** 飞书前端配置；appId/appSecret 只走环境变量，绝不入此文件。 */
+  feishu?: {
+    /** 新会话默认工作目录；省略用进程 cwd。 */
+    defaultCwd?: string
+  }
 }
 
 /** 配置缺失或非法：启动期 fail loud。 */
@@ -90,6 +95,14 @@ export async function loadConfig(path: string = DEFAULT_CONFIG_PATH): Promise<Bo
     fail('"runtime.dshBin" 必须是非空路径字符串')
   }
 
+  const feishu = raw.feishu
+  if (feishu !== undefined) {
+    if (!isRecord(feishu)) fail('"feishu" 必须是对象')
+    if (feishu.defaultCwd !== undefined && (typeof feishu.defaultCwd !== 'string' || feishu.defaultCwd.length === 0)) {
+      fail('"feishu.defaultCwd" 必须是非空路径字符串')
+    }
+  }
+
   const config: RuntimeConfig = {
     profile: DEFAULT_PROFILE,
     patches: [],
@@ -103,5 +116,9 @@ export async function loadConfig(path: string = DEFAULT_CONFIG_PATH): Promise<Bo
   if (maxTokens !== undefined) config.maxTokens = maxTokens
   if (typeof reasoningEffort === 'string') config.reasoningEffort = ReasoningEffortId(reasoningEffort)
   if (typeof dshBin === 'string') config.dshBin = dshBin
-  return { runtime: config }
+  const bot: BotConfig = { runtime: config }
+  if (feishu !== undefined) {
+    bot.feishu = { ...(typeof feishu.defaultCwd === 'string' ? { defaultCwd: feishu.defaultCwd } : {}) }
+  }
+  return bot
 }

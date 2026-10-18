@@ -13,12 +13,14 @@
   "scripts": {
     "start": "tsx src/index.ts",
     "tui": "tsx src/frontends/tui/main.tsx",
+    "feishu": "tsx src/frontends/feishu/main.ts",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx/esm --test tests/config.spec.ts tests/errors.spec.ts tests/router.spec.ts tests/live-events.spec.ts tests/e2e.spec.ts"
+    "test": "node --import tsx/esm --test tests/config.spec.ts tests/errors.spec.ts tests/router.spec.ts tests/registry.spec.ts tests/feishu-bot.spec.ts tests/live-events.spec.ts tests/live-feishu.spec.ts tests/e2e.spec.ts"
   },
   "dependencies": {
     "@deepseek-ai/dsh-llm": "0.2.1-rc.2",
     "@deepseek-ai/dsh-sdk-client": "0.2.1-rc.2",
+    "@larksuiteoapi/node-sdk": "^1.76.0",
     "ink": "^5.2.1",
     "ink-text-input": "^6.0.0",
     "react": "^18.3.1"

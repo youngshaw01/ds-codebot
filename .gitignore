@@ -8,3 +8,7 @@ out.txt
 err.txt
 tui-out.txt
 tui-err.txt
+lf-out.txt
+lf-err.txt
+all-out.txt
+all-err.txt

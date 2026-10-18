@@ -19,12 +19,21 @@ function countTools(events: RunResult['events']): { count: number; names: string
   return { count: names.length, names }
 }
 
+/** agent 运行时的最小接口：bot 等前端依赖此接口，测试可替换（DESIGN.md §4.1）。 */
+export interface AgentRuntime {
+  /** 提交一轮 prompt 并等待整机 idle。 */
+  prompt(input: string, sessionId: string): Promise<PromptOutcome>
+  /** 修改指定 session 的有效工作目录；返回校验后的绝对路径。 */
+  setCwd(path: string, sessionId: string): Promise<string>
+}
+
 /**
  * 一个进程对一个 dsh 运行时子进程的独占句柄（DESIGN.md §4.1）。
- * 懒启动、首次 prompt 前完成 initialize 握手；多 prompt 串行由调用方
- * 通过 promise 链保证（协议无排队语义，M1 CLI 自带了 FIFO）。
+ * 懒启动、首次 prompt 前完成 initialize 握手；一个运行时容纳多个 session
+ * （CLI/TUI 用构造默认 session，bot 按 chat_id 显式传 session）。多 prompt
+ * 的串行由调用方负责（协议无排队语义）。
  */
-export class RuntimePool {
+export class RuntimePool implements AgentRuntime {
   readonly sessionId: string
   /** 本池驱动 agent 所用的模型标识（状态栏展示用）。 */
   get modelId(): string {
@@ -70,12 +79,12 @@ export class RuntimePool {
   }
 
   /** 提交一轮 prompt 并等待整机 idle；任何 wire 失败映射为 `BotError`。 */
-  async prompt(input: string): Promise<PromptOutcome> {
+  async prompt(input: string, sessionId: string = this.sessionId): Promise<PromptOutcome> {
     await this.start()
     const harness = this.#harness
     if (!harness) throw new BotError('transport', '运行时未启动')
     try {
-      const result = await harness.run(input, { sessionId: this.sessionId })
+      const result = await harness.run(input, { sessionId })
       const { count, names } = countTools(result.events)
       return { sessionId: result.sessionId, finalResponse: result.finalResponse, toolCallCount: count, toolNames: names }
     } catch (error) {
@@ -83,27 +92,27 @@ export class RuntimePool {
     }
   }
 
-  /** 修改本 session 的有效工作目录（DESIGN.md M2 的 /cwd）；返回校验后的绝对路径。 */
-  async setCwd(path: string): Promise<string> {
+  /** 修改指定 session 的有效工作目录（TUI /cwd 与飞书 /cwd 共用）；返回校验后的绝对路径。 */
+  async setCwd(path: string, sessionId: string = this.sessionId): Promise<string> {
     await this.start()
     const harness = this.#harness
     if (!harness) throw new BotError('transport', '运行时未启动')
     try {
-      return await harness.session(this.sessionId).setWorkingDirectory(path)
+      return await harness.session(sessionId).setWorkingDirectory(path)
     } catch (error) {
       throw toBotError(error)
     }
   }
 
   /**
-   * 订阅本 session（含已发现子代理）的 wire 通知，交给 handler 分发。
+   * 订阅指定 session（含已发现子代理）的 wire 通知，交给 handler 分发。
    * 运行时只推全局流，session 树过滤由 client 完成（DESIGN.md §4.3）。
    * @returns 退订函数。
    */
-  subscribeSession(handler: (notification: HarnessNotification) => void): () => void {
+  subscribeSession(handler: (notification: HarnessNotification) => void, sessionId: string = this.sessionId): () => void {
     const harness = this.#harness
     if (!harness) throw new BotError('transport', '运行时未启动，先调用 start()')
-    const subscription = harness.client.subscribeSessionTree(this.sessionId)
+    const subscription = harness.client.subscribeSessionTree(sessionId)
     let active = true
     // 运行时会话结束后迭代自然结束/拒绝：此处只是结束循环，不向调用方抛错
     void (async () => {
