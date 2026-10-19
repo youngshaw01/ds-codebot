@@ -16,7 +16,7 @@
     "feishu": "tsx src/frontends/feishu/main.ts",
     "build:vscode": "node scripts/build-vscode.mjs",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx/esm --test tests/config.spec.ts tests/errors.spec.ts tests/router.spec.ts tests/registry.spec.ts tests/feishu-bot.spec.ts tests/snapshot.spec.ts tests/vscode-controller.spec.ts tests/live-events.spec.ts tests/live-feishu.spec.ts tests/live-vscode.spec.ts tests/e2e.spec.ts"
+    "test": "node --import tsx/esm --test tests/config.spec.ts tests/errors.spec.ts tests/router.spec.ts tests/registry.spec.ts tests/feishu-bot.spec.ts tests/snapshot.spec.ts tests/incremental-snapshot.spec.ts tests/vscode-controller.spec.ts tests/live-events.spec.ts tests/live-feishu.spec.ts tests/live-vscode.spec.ts tests/e2e.spec.ts"
   },
   "dependencies": {
     "@deepseek-ai/dsh-llm": "0.2.1-rc.2",

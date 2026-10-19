@@ -17,6 +17,8 @@ class FakeRuntime implements AgentRuntime {
   failWith: BotError | null = null
   delayMs = 0
 
+  async start() {}
+
   async prompt(input: string, sessionId: string) {
     this.prompts.push({ sessionId, input })
     if (this.delayMs > 0) await new Promise((resolve) => setTimeout(resolve, this.delayMs))
@@ -196,5 +198,45 @@ describe('parseMessageEvent', () => {
     assert.equal(parseMessageEvent({ message: { chat_id: 'c', message_id: 'm', message_type: 'text', content: 'not-json' } }), null)
     assert.equal(parseMessageEvent({ message: { message_id: 'm', message_type: 'text', content: '{"text":"x"}' } }), null)
     assert.equal(parseMessageEvent(null), null)
+  })
+
+  it('按 SDK 官方事件类型（@larksuiteoapi/node-sdk im.message.receive_v1）的完整字段解析', () => {
+    // 字段集照抄 node_modules/@larksuiteoapi/node-sdk types/index.d.ts 的
+    // im.message.receive_v1 负载：含可选 root_id/thread_id/sender 等
+    const parsed = parseMessageEvent({
+      event_id: 'ev-1',
+      token: 'tk',
+      create_time: '1730000000',
+      event_type: 'im.message.receive_v1',
+      tenant_key: 'tenant-1',
+      ts: '1730000000.0001',
+      uuid: 'uuid-1',
+      type: 'event_callback',
+      app_id: 'cli_app',
+      sender: {
+        sender_id: { union_id: 'u-1', user_id: 'u-2', open_id: 'ou_bot' },
+        sender_type: 'user',
+        tenant_key: 'tenant-1',
+      },
+      message: {
+        message_id: 'om_official',
+        root_id: 'om_root',
+        parent_id: 'om_parent',
+        create_time: '1730000000',
+        update_time: '1730000001',
+        chat_id: 'oc_official',
+        thread_id: 'thd_1',
+        chat_type: 'group',
+        message_type: 'text',
+        content: JSON.stringify({ text: '@_user_1 跑一下测试' }),
+        mentions: [{ key: '@_user_1', id: { open_id: 'ou_bot' }, mentioned_type: 'bot', name: 'ds-codebot', tenant_key: 'tenant-1' }],
+      },
+    })
+    assert.ok(parsed)
+    assert.equal(parsed.chatId, 'oc_official')
+    assert.equal(parsed.chatType, 'group')
+    assert.equal(parsed.text, '跑一下测试')
+    assert.equal(parsed.mentioned, true)
+    assert.equal(parsed.messageId, 'om_official')
   })
 })

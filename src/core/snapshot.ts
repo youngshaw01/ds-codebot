@@ -118,3 +118,107 @@ export function diffSnapshots(before: WorkspaceSnapshot, after: WorkspaceSnapsho
   }
   return diffs
 }
+
+type BaselineEntry =
+  | { kind: 'file'; size: number; mtimeMs: number; content: string }
+  | { kind: 'skipped'; size: number; mtimeMs: number; reason: SkipReason }
+
+/**
+ * 增量工作区快照（DESIGN.md M5）。
+ *
+ * 维护 stat 索引 + 内容基线：每次 capture 只做一次 stat 遍历，**仅读取
+ * size/mtimeMs 与基线不符的文件**，未变更文件直接复用基线内容。多轮对话的
+ * turn 边界成本从 O(工作区内容) 降为 O(变更文件数)。
+ *
+ * 代价与边界：
+ * - 基线常驻内存，体积受 maxFiles × maxFileBytes 约束——为长生命周期宿主
+ *   （VS Code 扩展、常驻 bot）设计；一次性脚本仍用 snapshotWorkspace。
+ * - 以 (size, mtimeMs) 判定变更：文件系统 mtime 粒度粗（常见 1–2s）时，
+ *   同秒内等大小改写可能漏检。生产级可加内容哈希，留作后续演进。
+ */
+export class IncrementalWorkspace {
+  readonly root: string
+  #options: SnapshotOptions
+  #baseline = new Map<string, BaselineEntry>()
+  #reads = 0
+
+  constructor(root: string, options?: Partial<SnapshotOptions>) {
+    this.root = root
+    this.#options = { ...DEFAULT_SNAPSHOT_OPTIONS, ...options }
+  }
+
+  /** 本实例累计真实读取的文件次数（测试与可观测用）。 */
+  get readCount(): number {
+    return this.#reads
+  }
+
+  async capture(): Promise<WorkspaceSnapshot> {
+    const stats = await this.#statWalk()
+    const files = new Map<string, string>()
+    const skipped = new Map<string, SkipReason>()
+    for (const [rel, info] of stats) {
+      const cached = this.#baseline.get(rel)
+      if (cached && cached.size === info.size && cached.mtimeMs === info.mtimeMs) {
+        if (cached.kind === 'file') files.set(rel, cached.content)
+        else skipped.set(rel, cached.reason)
+        continue
+      }
+      this.#reads += 1
+      try {
+        if (info.size > this.#options.maxFileBytes) {
+          skipped.set(rel, 'too-large')
+          this.#baseline.set(rel, { kind: 'skipped', size: info.size, mtimeMs: info.mtimeMs, reason: 'too-large' })
+          continue
+        }
+        const content = await readFile(join(this.root, rel), 'utf8')
+        if (isBinary(content)) {
+          skipped.set(rel, 'binary')
+          this.#baseline.set(rel, { kind: 'skipped', size: info.size, mtimeMs: info.mtimeMs, reason: 'binary' })
+          continue
+        }
+        files.set(rel, content)
+        this.#baseline.set(rel, { kind: 'file', size: info.size, mtimeMs: info.mtimeMs, content })
+      } catch {
+        skipped.set(rel, 'unreadable')
+      }
+    }
+    // 消失的文件移出基线，避免无限增长
+    for (const rel of [...this.#baseline.keys()]) {
+      if (!stats.has(rel)) this.#baseline.delete(rel)
+    }
+    return { root: this.root, files, skipped }
+  }
+
+  /** stat-only 遍历：只取 size/mtimeMs，不读内容。 */
+  async #statWalk(): Promise<Map<string, { size: number; mtimeMs: number }>> {
+    const stats = new Map<string, { size: number; mtimeMs: number }>()
+    const queue: string[] = [this.root]
+    while (queue.length > 0 && stats.size < this.#options.maxFiles) {
+      const directory = queue.shift()
+      if (directory === undefined) break
+      let entries
+      try {
+        entries = await readdir(directory, { withFileTypes: true })
+      } catch {
+        continue
+      }
+      for (const entry of entries) {
+        if (stats.size >= this.#options.maxFiles) break
+        const full = join(directory, entry.name)
+        if (entry.isDirectory()) {
+          if (!this.#options.ignoreDirs.includes(entry.name)) queue.push(full)
+          continue
+        }
+        if (!entry.isFile()) continue
+        const rel = relative(this.root, full).split(sep).join('/')
+        try {
+          const info = await stat(full)
+          stats.set(rel, { size: info.size, mtimeMs: info.mtimeMs })
+        } catch {
+          continue
+        }
+      }
+    }
+    return stats
+  }
+}

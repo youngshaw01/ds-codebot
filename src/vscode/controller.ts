@@ -1,7 +1,7 @@
 import type { AgentRuntime } from '../core/runtime.ts'
 import { SessionRegistry } from '../core/registry.ts'
 import { EventRouter, type UiEvent } from '../core/router.ts'
-import { diffSnapshots, snapshotWorkspace, type FileDiff } from '../core/snapshot.ts'
+import { diffSnapshots, IncrementalWorkspace, type FileDiff } from '../core/snapshot.ts'
 import type { VscodeApi, WebviewPanelLike, WorkspaceFolderLike } from './api.ts'
 import { webviewHtml } from './webview/html.ts'
 
@@ -22,6 +22,7 @@ export class ChatController {
 
   #panel: WebviewPanelLike | null = null
   #folder: WorkspaceFolderLike | null = null
+  #workspaces = new Map<string, IncrementalWorkspace>()
   #disposable: (() => void) | null = null
 
   constructor(
@@ -100,9 +101,10 @@ export class ChatController {
     const trimmed = text.trim()
     if (trimmed.length === 0) return
     try {
-      const before = await snapshotWorkspace(folder.uri)
+      const workspace = this.#workspaceFor(folder)
+      const before = await workspace.capture()
       await this.runtime.prompt(trimmed, sessionId)
-      const after = await snapshotWorkspace(folder.uri)
+      const after = await workspace.capture()
       const files = diffSnapshots(before, after)
       if (files.length > 0) this.#post({ type: 'turn-diff', files })
     } catch (error) {
@@ -110,13 +112,24 @@ export class ChatController {
     }
   }
 
-  /** 释放：退订通知、关闭面板。deactivate 与测试拆卸路径共用。 */
+  /** 释放：退订通知、关闭面板、丢弃增量工作区。deactivate 与测试拆卸路径共用。 */
   dispose(): void {
     this.#disposable?.()
     this.#disposable = null
+    this.#workspaces.clear()
     this.#panel?.dispose()
     this.#panel = null
     this.#folder = null
+  }
+
+  /** 每 folder 一个增量基线（M5）：turn 边界只读变更文件。 */
+  #workspaceFor(folder: WorkspaceFolderLike): IncrementalWorkspace {
+    let workspace = this.#workspaces.get(folder.uri)
+    if (!workspace) {
+      workspace = new IncrementalWorkspace(folder.uri)
+      this.#workspaces.set(folder.uri, workspace)
+    }
+    return workspace
   }
 
   #post(message: HostToWebview): void {
