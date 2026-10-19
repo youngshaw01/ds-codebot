@@ -21,10 +21,14 @@ function countTools(events: RunResult['events']): { count: number; names: string
 
 /** agent 运行时的最小接口：bot 等前端依赖此接口，测试可替换（DESIGN.md §4.1）。 */
 export interface AgentRuntime {
+  /** 启动运行时并完成握手；重复调用幂等（懒启动入口）。 */
+  start(): Promise<void>
   /** 提交一轮 prompt 并等待整机 idle。 */
   prompt(input: string, sessionId: string): Promise<PromptOutcome>
   /** 修改指定 session 的有效工作目录；返回校验后的绝对路径。 */
   setCwd(path: string, sessionId: string): Promise<string>
+  /** 订阅指定 session 的 wire 通知；返回退订函数。 */
+  subscribeSession(handler: (notification: HarnessNotification) => void, sessionId: string): () => void
 }
 
 /**
@@ -68,6 +72,7 @@ export class RuntimePool implements AgentRuntime {
       ...(this.config.maxTokens !== undefined ? { maxTokens: this.config.maxTokens } : {}),
       ...(this.config.reasoningEffort !== undefined ? { reasoningEffort: this.config.reasoningEffort } : {}),
       ...(this.config.dshBin !== undefined ? { dshBin: this.config.dshBin } : {}),
+      ...(this.config.initializeTimeoutMs !== undefined ? { initializeTimeoutMs: this.config.initializeTimeoutMs } : {}),
     })
     await harness.start()
     if (this.#closed) {

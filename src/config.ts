@@ -18,6 +18,8 @@ export interface RuntimeConfig {
   reasoningEffort?: ReasoningEffortId
   /** 显式 dsh 可执行文件；省略由 SDK client 按同版本解析。 */
   dshBin?: string
+  /** initialize 握手超时（毫秒）；冷启动/慢盘机器可调大，默认 10000。 */
+  initializeTimeoutMs?: number
 }
 
 /** ds-codebot 配置文件结构。 */
@@ -95,6 +97,14 @@ export async function loadConfig(path: string = DEFAULT_CONFIG_PATH): Promise<Bo
     fail('"runtime.dshBin" 必须是非空路径字符串')
   }
 
+  const initializeTimeoutMs = runtime.initializeTimeoutMs
+  if (
+    initializeTimeoutMs !== undefined &&
+    (typeof initializeTimeoutMs !== 'number' || !Number.isSafeInteger(initializeTimeoutMs) || initializeTimeoutMs <= 0)
+  ) {
+    fail('"runtime.initializeTimeoutMs" 必须是正整数')
+  }
+
   const feishu = raw.feishu
   if (feishu !== undefined) {
     if (!isRecord(feishu)) fail('"feishu" 必须是对象')
@@ -116,6 +126,7 @@ export async function loadConfig(path: string = DEFAULT_CONFIG_PATH): Promise<Bo
   if (maxTokens !== undefined) config.maxTokens = maxTokens
   if (typeof reasoningEffort === 'string') config.reasoningEffort = ReasoningEffortId(reasoningEffort)
   if (typeof dshBin === 'string') config.dshBin = dshBin
+  if (initializeTimeoutMs !== undefined) config.initializeTimeoutMs = initializeTimeoutMs
   const bot: BotConfig = { runtime: config }
   if (feishu !== undefined) {
     bot.feishu = { ...(typeof feishu.defaultCwd === 'string' ? { defaultCwd: feishu.defaultCwd } : {}) }

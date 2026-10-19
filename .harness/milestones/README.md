@@ -23,7 +23,7 @@
 | M1 driver | CLI 连续对话 3 轮；Ctrl-C 安全 teardown；e2e 无 key skip | 已完成（验收全通过，复盘见 [M1-review.md](M1-review.md)） | [M1-review.md](M1-review.md) |
 | M2 TUI | tool_call 可见；`/cwd` 后续聊连续；turn 指示 | 已完成（复盘见 [M2-review.md](M2-review.md)，TTY 手工冒烟待用户首跑） | [M2-review.md](M2-review.md) |
 | M3 飞书 | 群内 @bot 完成任务；同群上下文连续 | 代码与内部验证完成；真实租户联调待凭据（复盘见 [M3-review.md](M3-review.md)） | [M3-review.md](M3-review.md) |
-| M4 VSCode | 工作区会话绑定；diff 展示 | 未开始 | — |
+| M4 VSCode | 工作区会话绑定；diff 展示 | 已完成（复盘见 [M4-review.md](M4-review.md)，真实宿主联调待首跑） | [M4-review.md](M4-review.md) |
 
 ## 防陷阱（来自 goal pitfalls）
 

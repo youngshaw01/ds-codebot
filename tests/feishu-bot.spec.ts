@@ -28,6 +28,10 @@ class FakeRuntime implements AgentRuntime {
     this.cwds.set(sessionId, path)
     return `/abs/${path}`
   }
+
+  subscribeSession(): () => void {
+    return () => undefined
+  }
 }
 
 class FakeGateway implements FeishuGateway {

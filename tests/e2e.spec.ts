@@ -11,7 +11,7 @@ const maybe = key && key.length > 0 ? describe : describe.skip
 maybe('e2e: 真实 dsh 运行时', () => {
   it('连续两轮对话保持同一 session', async () => {
     const { runtime } = await loadConfig(DEFAULT_CONFIG_PATH)
-    const pool = new RuntimePool(runtime)
+    const pool = new RuntimePool({ ...runtime, initializeTimeoutMs: 60000 })
     try {
       const first = await pool.prompt('请只回复：第一轮确认')
       assert.ok(first.finalResponse.length > 0)

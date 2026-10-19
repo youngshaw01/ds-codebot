@@ -44,7 +44,16 @@ TUI 模式（ink 全屏界面，工具调用实时可见、`/cwd` 切目录、�
 npm run tui    # 需要真实 TTY 终端；管道/CI 环境会 fail-loud 并指引回 CLI 模式
 ```
 
-当前进度：M1 driver、M2 TUI 已完成，M3 飞书 bot 代码与内部验证完成（真实飞书租户联调待凭据），复盘见 `.harness/milestones/`。
+当前进度：M1–M4 全部完成（复盘见 `.harness/milestones/`）。M3 真实飞书租户联调、M4 真实 VS Code 宿主联调待首跑。
+
+### VS Code 扩展
+
+```sh
+npm run build:vscode    # esbuild 打包到 dist-vscode/（单文件 CJS + 扩展清单）
+code --extensionDevelopmentPath=dist-vscode   # 扩展开发宿主中加载
+```
+
+命令面板执行 `ds-codebot: 打开编码助手`：绑定当前工作区文件夹 ↔ session，对话与工具调用实时渲染，每轮结束后推送工作区 `turn-diff`（宿主侧快照 + 行差分）。输入框支持 `/cwd <目录>`。注意：审批交互无法经 SDK wire 传递，权限须在 `ds-codebot.config.json` 的 patch 层预置。
 
 ### 飞书 bot
 

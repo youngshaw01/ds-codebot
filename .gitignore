@@ -12,3 +12,9 @@ lf-out.txt
 lf-err.txt
 all-out.txt
 all-err.txt
+*-out.txt
+*-err.txt
+# VS Code 扩展构建产物
+dist-vscode/
+# live 测试产物
+proof.txt

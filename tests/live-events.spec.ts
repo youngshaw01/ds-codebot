@@ -12,7 +12,7 @@ const maybe = key && key.length > 0 ? describe : describe.skip
 maybe('live: 真实运行时事件流', () => {
   it('一轮触发工具的 prompt：router 收到 tool-call 与 assistant 文本', async () => {
     const { runtime } = await loadConfig(DEFAULT_CONFIG_PATH)
-    const pool = new RuntimePool(runtime)
+    const pool = new RuntimePool({ ...runtime, initializeTimeoutMs: 60000 })
     await pool.start()
     const events: UiEvent[] = []
     const router = new EventRouter(pool.sessionId, (event) => events.push(event))
@@ -38,7 +38,7 @@ maybe('live: 真实运行时事件流', () => {
 
   it('/cwd 等价路径：切换工作目录后会话继续', async () => {
     const { runtime } = await loadConfig(DEFAULT_CONFIG_PATH)
-    const pool = new RuntimePool(runtime)
+    const pool = new RuntimePool({ ...runtime, initializeTimeoutMs: 60000 })
     try {
       const absolute = await pool.setCwd('..')
       assert.ok(absolute.length > 0)

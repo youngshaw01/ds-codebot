@@ -35,7 +35,7 @@ class CollectingGateway implements FeishuGateway {
 async function setup(): Promise<{ bot: FeishuBot; registry: SessionRegistry; gateway: CollectingGateway; pool: RuntimePool; dir: string }> {
   const dir = await mkdtemp(join(tmpdir(), 'ds-codebot-live-feishu-'))
   const { runtime } = await loadConfig(DEFAULT_CONFIG_PATH)
-  const pool = new RuntimePool(runtime)
+  const pool = new RuntimePool({ ...runtime, initializeTimeoutMs: 60000 })
   await pool.start()
   const registry = new SessionRegistry(join(dir, 'registry.json'))
   await registry.load()

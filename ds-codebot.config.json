@@ -2,6 +2,7 @@
   "runtime": {
     "profile": "sdk",
     "provider": "deepseek-official",
-    "model": "deepseek-flash"
+    "model": "deepseek-flash",
+    "initializeTimeoutMs": 60000
   }
 }

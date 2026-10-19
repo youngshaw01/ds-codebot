@@ -79,4 +79,22 @@ describe('loadConfig', () => {
     const path = await writeConfig('badmaxtokens.json', JSON.stringify({ runtime: { maxTokens: 0 } }))
     await assert.rejects(loadConfig(path), ConfigError)
   })
+
+  it('读取 initializeTimeoutMs；非法值抛 ConfigError', async () => {
+    const path = await writeConfig('inittimeout.json', JSON.stringify({ runtime: { initializeTimeoutMs: 60000 } }))
+    const config = await loadConfig(path)
+    assert.equal(config.runtime.initializeTimeoutMs, 60000)
+
+    const bad = await writeConfig('badinittimeout.json', JSON.stringify({ runtime: { initializeTimeoutMs: -1 } }))
+    await assert.rejects(loadConfig(bad), ConfigError)
+  })
+
+  it('feishu 节可缺省；defaultCwd 非空字符串', async () => {
+    const withFeishu = await writeConfig('feishu.json', JSON.stringify({ runtime: {}, feishu: { defaultCwd: 'D:\\repo' } }))
+    const config = await loadConfig(withFeishu)
+    assert.equal(config.feishu?.defaultCwd, 'D:\\repo')
+
+    const bad = await writeConfig('badfeishu.json', JSON.stringify({ runtime: {}, feishu: { defaultCwd: '' } }))
+    await assert.rejects(loadConfig(bad), ConfigError)
+  })
 })
