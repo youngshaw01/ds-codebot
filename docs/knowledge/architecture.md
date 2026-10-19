@@ -149,3 +149,10 @@ type Binding = {
 1. `session/prompt → session/wait → idle` 的 activity interval 语义：prompt 返回的是入队回执，不是结果；结果区间以整机 idle 收口，且 `finalResponse` 是区间内最后一条 root assistant 文本，不与单次输入因果绑定。
 2. 通知是全局流，session 边界过滤是客户端自己的责任。
 3. 审批不走 wire，权限必须在启动配置里预置——这决定了 bot 类产品的整套安全姿态。
+
+## 变更记录
+
+| 日期 | 来源 change-id | 摘要 |
+| --- | --- | --- |
+| 2026-10-18 | bootstrap | 初始设计（M1 前建立，DESIGN.md 原名） |
+| 2026-10-19 | docs-harness-contract-adoption-001 | 迁移至 docs/knowledge/architecture.md（Harness Contract v3 落位） |

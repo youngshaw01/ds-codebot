@@ -23,4 +23,11 @@ Status: proposed | accepted | superseded by [<新记录>](<相对链接>)
 
 ## 登记
 
-新记录须在 [.harness/README.md](../README.md) 的文档表中登记。
+新记录须在 [`docs/knowledge/README.md`](../README.md) 的索引中登记。
+
+## 变更记录
+
+| 日期 | 来源 change-id | 摘要 |
+| --- | --- | --- |
+| 2026-10-18 | bootstrap | 决策记录规则建立（.harness/decisions/ 原名） |
+| 2026-10-19 | docs-harness-contract-adoption-001 | 迁移至 docs/knowledge/decisions/ |

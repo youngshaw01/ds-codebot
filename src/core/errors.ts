@@ -1,6 +1,6 @@
 import { JsonRpcResponseError, RequestTimeoutError, SdkProtocolError, TransportClosedError } from '@deepseek-ai/dsh-sdk-client'
 
-/** wire 失败分类，对应 DESIGN.md §4.5 的错误处理矩阵。 */
+/** wire 失败分类，对应 docs/knowledge/architecture.md §4.5 的错误处理矩阵。 */
 export type BotErrorKind = 'transport' | 'timeout' | 'protocol' | 'wire' | 'unknown'
 
 /** 带分类的运行时错误；前端按 kind 分流用户可见行为。 */

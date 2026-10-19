@@ -12,21 +12,25 @@
 | `src/` | 可执行代码 | 是 |
 | `state/` | 运行时状态（如会话映射 `registry.json`） | 否 |
 
-设计、协议约定、里程碑等文档统一存放于 `.harness/`，与代码目录严格分离。
+工程管理遵循 [ai-engineering-standards](D:/ai/ai-engineering-standards)（Harness Contract v3）：`.harness/` 机器配置与变更工作区、`docs/knowledge/` 架构与决策、`docs/rules/` 项目规则，与代码目录严格分离。
 
 ## 文档
 
-- [详细设计](.harness/DESIGN.md) —— 架构、模块契约、协议约束、里程碑
-- [规范索引](.harness/README.md) —— `.harness/` 全部规范文档目录
+- [架构与协议边界](docs/knowledge/architecture.md) —— 架构、模块契约、协议约束、设计决策
+- [决策记录](docs/knowledge/decisions/) —— 为什么这样定、放弃了什么
+- [项目规则](docs/rules/) —— `charter.md` 项目宪法 + `change-units.md` 逐刀协议
+- [归档复盘](.harness/workspace/archive/) —— M1–M6 每刀的验收与 retro
 
-## 路线图
+## 路线图（已全部完成）
 
-| 里程碑 | 内容 | 状态 |
+| 刀次 | 内容 | retro |
 |---|---|---|
-| M1 | driver：`RuntimePool` + 最小 CLI（prompt → wait → 打印结果） | 未开工 |
-| M2 | TUI 前端（ink 流式渲染、`/cwd`、turn 指示） | 未开工 |
-| M3 | 飞书 bot（事件客户端、会话映射、全局流路由） | 未开工 |
-| M4 | VS Code 扩展后端（可选） | 未开工 |
+| M1 | driver：`RuntimePool` + 最小 CLI | `archive/20261018-feature-m1-driver-001` |
+| M2 | TUI 前端（ink、`/cwd`、turn 指示） | `archive/20261018-feature-m2-tui-001` |
+| M3 | 飞书 bot（事件客户端、会话映射） | `archive/20261018-feature-m3-feishu-bot-001` |
+| M4 | VS Code 扩展（工作区绑定、turn diff） | `archive/20261019-feature-m4-vscode-extension-001` |
+| M5 | 增量快照（stat 索引、只读变更） | `archive/20261019-feature-m5-incremental-snapshot-001` |
+| M6 | 快照增强（持久化、内容哈希、文件监听） | `archive/20261019-feature-m6-snapshot-enhancements-001` |
 
 ## 快速开始
 
@@ -44,7 +48,7 @@ TUI 模式（ink 全屏界面，工具调用实时可见、`/cwd` 切目录、�
 npm run tui    # 需要真实 TTY 终端；管道/CI 环境会 fail-loud 并指引回 CLI 模式
 ```
 
-当前进度：M1–M4 全部完成（复盘见 `.harness/milestones/`）。M3 真实飞书租户联调、M4 真实 VS Code 宿主联调待首跑。
+当前进度：M1–M6 全部完成。M3 真实飞书租户联调、M4 真实 VS Code 宿主联调待首跑（见上表 retro）。
 
 ### VS Code 扩展
 

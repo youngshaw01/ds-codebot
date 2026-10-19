@@ -4,7 +4,7 @@ import { BotError } from '../src/core/errors.ts'
 import { RuntimePool } from '../src/core/runtime.ts'
 import { DEFAULT_CONFIG_PATH, loadConfig } from '../src/config.ts'
 
-// 真实 API e2e：无 DEEPSEEK_API_KEY 时跳过（DESIGN.md §7 测试策略）
+// 真实 API e2e：无 DEEPSEEK_API_KEY 时跳过（docs/knowledge/architecture.md §7 测试策略）
 const key = process.env.DEEPSEEK_API_KEY
 const maybe = key && key.length > 0 ? describe : describe.skip
 

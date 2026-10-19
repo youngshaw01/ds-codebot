@@ -10,9 +10,9 @@ import type { HostToWebview } from '../src/vscode/controller.ts'
 import type { VscodeApi, WebviewPanelLike, WorkspaceFolderLike } from '../src/vscode/api.ts'
 import { DEFAULT_CONFIG_PATH, loadConfig } from '../src/config.ts'
 
-// M4 验收（DESIGN.md §6）：工作区会话绑定；turn diff 展示。
+// M4 验收（docs/knowledge/architecture.md §6）：工作区会话绑定；turn diff 展示。
 // 真实 dsh 运行时 + 内存假 vscode API；真实 VS Code 宿主联调需安装扩展（README）。
-// 真实 API e2e：无 DEEPSEEK_API_KEY 时跳过（DESIGN.md §7 测试策略）
+// 真实 API e2e：无 DEEPSEEK_API_KEY 时跳过（docs/knowledge/architecture.md §7 测试策略）
 const key = process.env.DEEPSEEK_API_KEY
 const maybe = key && key.length > 0 ? describe : describe.skip
 

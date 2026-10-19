@@ -9,10 +9,10 @@ import { FeishuBot } from '../src/frontends/feishu/bot.ts'
 import type { FeishuGateway, FeishuMessage } from '../src/frontends/feishu/gateway.ts'
 import { DEFAULT_CONFIG_PATH, loadConfig } from '../src/config.ts'
 
-// M3 验收（DESIGN.md §6）：群内 @bot 执行任务；同群上下文连续。
+// M3 验收（docs/knowledge/architecture.md §6）：群内 @bot 执行任务；同群上下文连续。
 // 以真实 dsh 运行时 + 内存假网关替代真实飞书租户（无租户凭据时的最大验证深度）；
 // 真实网关的长连接装配由 lark.ts 的 parseMessageEvent 单测覆盖。
-// 真实 API e2e：无 DEEPSEEK_API_KEY 时跳过（DESIGN.md §7 测试策略）
+// 真实 API e2e：无 DEEPSEEK_API_KEY 时跳过（docs/knowledge/architecture.md §7 测试策略）
 const key = process.env.DEEPSEEK_API_KEY
 const maybe = key && key.length > 0 ? describe : describe.skip
 

@@ -78,7 +78,7 @@ async function walk(root: string, options: SnapshotOptions, skipped: Map<string,
   return files
 }
 
-/** 对工作区做一次文本快照（DESIGN.md M4 diff 的数据源）。 */
+/** 对工作区做一次文本快照（docs/knowledge/architecture.md M4 diff 的数据源）。 */
 export async function snapshotWorkspace(root: string, options?: Partial<SnapshotOptions>): Promise<WorkspaceSnapshot> {
   const resolved: SnapshotOptions = { ...DEFAULT_SNAPSHOT_OPTIONS, ...options }
   const skipped = new Map<string, SkipReason>()
@@ -131,7 +131,7 @@ function contentHash(content: string): string {
 }
 
 /**
- * 增量工作区快照（DESIGN.md M5；M6.1 持久化 / M6.2 内容哈希 / M6.3 文件监听）。
+ * 增量工作区快照（docs/knowledge/architecture.md M5；M6.1 持久化 / M6.2 内容哈希 / M6.3 文件监听）。
  *
  * 维护 stat 索引 + 内容基线：每次 capture 只做一次 stat 遍历，**仅读取
  * size/mtimeMs 与基线不符（M6.3：或被监听器标记）的文件**，未变更文件直接

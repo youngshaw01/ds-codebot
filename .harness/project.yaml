@@ -1,0 +1,12 @@
+schemaVersion: "3.0.0"
+projectId: ds-codebot
+displayName: "ds-codebot"
+vcs: git
+standards:
+  repository: ai-engineering-standards
+  version: "3.1.0"
+  contract: contract/harness-contract.md
+adoptedAt: "2026-10-19"
+# 可选：定制变更类型清单（缺省 feature|bugfix|refactor|docs|ops）
+# workflow:
+#   types: [feature, bugfix, refactor, docs, ops]

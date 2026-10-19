@@ -39,7 +39,7 @@ function parseBindings(raw: unknown): SessionBinding[] {
 }
 
 /**
- * 外部会话 ↔ dsh session 映射（DESIGN.md §4.2）。
+ * 外部会话 ↔ dsh session 映射（docs/knowledge/architecture.md §4.2）。
  * 持久化到 JSON，进程重启后飞书会话可续聊（session 历史由 dsh 侧保留，
  * 客户端只需记住 id）。并发写通过串行化的 flush 队列保证。
  */

@@ -3,7 +3,7 @@ import { DeepSeekHarness, type HarnessNotification, type RunResult } from '@deep
 import type { RuntimeConfig } from '../config.ts'
 import { BotError, toBotError } from './errors.ts'
 
-/** 一轮 prompt 的结算结果（DESIGN.md §6 M1 验收口径）。 */
+/** 一轮 prompt 的结算结果（docs/knowledge/architecture.md §6 M1 验收口径）。 */
 export interface PromptOutcome {
   sessionId: string
   /** 区间内最后一条 root assistant 文本，无回复时为空串。 */
@@ -19,7 +19,7 @@ function countTools(events: RunResult['events']): { count: number; names: string
   return { count: names.length, names }
 }
 
-/** agent 运行时的最小接口：bot 等前端依赖此接口，测试可替换（DESIGN.md §4.1）。 */
+/** agent 运行时的最小接口：bot 等前端依赖此接口，测试可替换（docs/knowledge/architecture.md §4.1）。 */
 export interface AgentRuntime {
   /** 启动运行时并完成握手；重复调用幂等（懒启动入口）。 */
   start(): Promise<void>
@@ -32,7 +32,7 @@ export interface AgentRuntime {
 }
 
 /**
- * 一个进程对一个 dsh 运行时子进程的独占句柄（DESIGN.md §4.1）。
+ * 一个进程对一个 dsh 运行时子进程的独占句柄（docs/knowledge/architecture.md §4.1）。
  * 懒启动、首次 prompt 前完成 initialize 握手；一个运行时容纳多个 session
  * （CLI/TUI 用构造默认 session，bot 按 chat_id 显式传 session）。多 prompt
  * 的串行由调用方负责（协议无排队语义）。
@@ -111,7 +111,7 @@ export class RuntimePool implements AgentRuntime {
 
   /**
    * 订阅指定 session（含已发现子代理）的 wire 通知，交给 handler 分发。
-   * 运行时只推全局流，session 树过滤由 client 完成（DESIGN.md §4.3）。
+   * 运行时只推全局流，session 树过滤由 client 完成（docs/knowledge/architecture.md §4.3）。
    * @returns 退订函数。
    */
   subscribeSession(handler: (notification: HarnessNotification) => void, sessionId: string = this.sessionId): () => void {

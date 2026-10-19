@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { ReasoningEffortId } from '@deepseek-ai/dsh-llm'
 
-/** dsh 运行时启动参数（ DESIGN.md §5 的 runtime 节）。 */
+/** dsh 运行时启动参数（ docs/knowledge/architecture.md §5 的 runtime 节）。 */
 export interface RuntimeConfig {
   /** 驱动 SDK 协议的 dsh profile，默认 `sdk`。 */
   profile: string

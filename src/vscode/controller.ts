@@ -23,7 +23,7 @@ export interface ChatControllerOptions {
 }
 
 /**
- * VS Code 聊天控制器（DESIGN.md M4）：
+ * VS Code 聊天控制器（docs/knowledge/architecture.md M4）：
  * 工作区文件夹 ↔ session 绑定；prompt 前后快照工作区产出 turn diff；
  * wire 通知经 EventRouter 转为 UI 事件转发 webview。审批不可达 wire，
  * 权限必须在启动配置预置（见 README）- controller 不做审批交互。

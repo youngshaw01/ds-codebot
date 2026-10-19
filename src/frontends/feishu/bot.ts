@@ -13,7 +13,7 @@ export interface FeishuBotOptions {
 const DEFAULT_MAX_REPLY_CHARS = 20_000
 
 /**
- * 飞书 bot 核心（DESIGN.md M3）：
+ * 飞书 bot 核心（docs/knowledge/architecture.md M3）：
  * 群消息必须 @bot、p2p 全收；chat_id → session 绑定持久化；
  * 同一 chat 的 prompt 按 FIFO 串行（协议无排队语义）；
  * 全局通知流的 session 过滤由 RuntimePool.subscribeSession 完成，本类不直接消费通知。

@@ -1,37 +1,31 @@
-# AGENTS.md — ds-codebot 常驻规则
+# AGENTS.md
 
-本文件是本仓库的 standing orders：每条规则一至三行，细节链接到其唯一归属文档。新增规则先判断归属层级，禁止在多处复述同一事实。
+> v3 入口。契约：`ai-engineering-standards` → `contract/harness-contract.md`（Layer 0）
 
-## 目录边界
+## Project
 
-- `.harness/` 只放规范、设计与决策文档，禁止放可执行代码；索引见 [.harness/README.md](.harness/README.md)。
-- `src/` 是唯一代码目录；`state/` 是运行时状态，已 gitignore，禁止手写或提交。
+- 机器配置：`.harness/project.yaml`
+- 变更工作区：`.harness/workspace/changes/`（进行中）· `.harness/workspace/archive/`（已归档，M1–M6 retro）
+- 领域知识：`docs/knowledge/`（架构与协议边界：`architecture.md`）· 项目特化规则：`docs/rules/`（含 `charter.md` 项目宪法与 `change-units.md` 逐刀协议）
 
-## 协议事实的唯一来源
+## Rules
 
-- SDK 协议行为（方法、通知、错误）以 `@deepseek-ai/dsh-sdk-protocol` / `@deepseek-ai/dsh-sdk-client` 包内 README 与类型为准，禁止凭记忆写协议；行为变化时同步更新 [.harness/DESIGN.md](.harness/DESIGN.md) 对应章节。
-- deepseek-harness 的行为以其仓库文档为准；本仓库不 fork、不修改其源码，如需自定义运行时行为只能通过 profile + patch 叠加（[DESIGN.md §1](.harness/DESIGN.md)）。
+- 业务事实以代码与测试为准；勿将本文件当作需求文档。
+- 工具规则扩展前须先修订 Layer 0 契约，禁止在项目内复制完整标准树。
+- 变更产物写入所属 change 的 `artifacts/`，禁止散落 workspace 根。
+- 本项目宪法（不可协商原则）见 [`docs/rules/charter.md`](docs/rules/charter.md)：不碰上游仓库、凭据只走环境变量、协议事实以 SDK 包为准、fail loud、wire 边界校验、测试等待被测路径。
 
-## 版本对齐
+## Workflow（变更单元）
 
-- client 与运行时必须同版本：升级时同步升级 package.json 中 `@deepseek-ai/dsh-sdk-*` 与 `@deepseek-ai/dsh`，版本不匹配属于 `SdkProtocolError` 处理范畴（[DESIGN.md §4.5](.harness/DESIGN.md)）。
+1. （方向不明时）先写 `explore.md`：问题 / 选项 / 约束 / 待决问题过一遍，人拍板后再动笔
+2. 创建 change：`{type}-{slug}-{NNN}/`，从标准库 `templates/change/` 起草 proposal + tasks；proposal 验收标准用 `AC-<n>` 编号（执行纪律见 `docs/rules/change-units.md`）
+3. 最小改动实现，勾选 tasks
+4. verify 记录构建/测试证据，人工核查逐条引用 AC 编号；未验证不得声称通过
+5. 归档：移入 `archive/` 并加 `{YYYYMMDD}-` 前缀；补 `retro.md` 复盘
+6. 有持久认知价值 → 合并进 `docs/knowledge/` 并登记"变更记录"
 
-## 安全
+## 常用命令
 
-- 任何 secret（API key、飞书 appSecret）只走环境变量或运行时凭据，禁止写入配置文件、测试快照与 git；`.env*` 已 gitignore。
-
-## 决策记录
-
-- 影响结构或协议的长期决策（为什么、放弃了什么、后果）写成决策记录放 `.harness/decisions/`，规则见 [decisions/README.md](.harness/decisions/README.md)；机械性改动豁免。代码变更同 PR 更新受影响的既有记录，不新建重复记录。
-
-## 测试
-
-- 协议层（`runtime.ts`/`router.ts`）必须有测试：e2e 无 `DEEPSEEK_API_KEY` 时 skip；事件路由用录制的 `session.event` JSONL 回放断言（[DESIGN.md §7](.harness/DESIGN.md)）。
-
-## 提交
-
-- commit message 用 `type: 摘要`（type ∈ docs/feat/fix/chore/refactor/test）；一个提交一件事；推送前本地 `npm run typecheck && npm test` 通过。
-
-## 文档
-
-- 文档只描述当前状态，历史留在 commit 与决策记录里；README 与 `.harness/` 的变更随对应代码变更同 PR 提交。
+- `npm run typecheck` · `npm test`（无 `DEEPSEEK_API_KEY` 时 live 测试自动 skip）
+- `npm start`（CLI）· `npm run tui`（TUI）· `npm run feishu`（飞书 bot）· `npm run build:vscode`（VS Code 扩展）
+- 校验本项目契约符合性：`node D:/ai/ai-engineering-standards/src/validate.mjs --project .`

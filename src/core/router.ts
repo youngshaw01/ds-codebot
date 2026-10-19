@@ -1,7 +1,7 @@
 import { validatedSessionEvent, type HarnessNotification } from '@deepseek-ai/dsh-sdk-client'
 import type { ContentBlock } from '@deepseek-ai/dsh-llm'
 
-/** 前端可渲染的最小事件集：由 `EventRouter` 从 wire 通知派生（DESIGN.md §4.3）。 */
+/** 前端可渲染的最小事件集：由 `EventRouter` 从 wire 通知派生（docs/knowledge/architecture.md §4.3）。 */
 export type UiEvent =
   | { kind: 'turn-start' }
   | { kind: 'turn-end' }

@@ -1,17 +1,7 @@
-# .harness/ —— 规范文档目录
+# .harness
 
-本目录存放 ds-codebot 的全部规范、设计与决策文档，**不含可执行代码**。代码一律放 `src/`，运行时状态放 `state/`（已 gitignore）。任何新增规范文档须放置本目录并在下表登记。
+由 `ai-engineering-standards` v3 `adopt` 生成 + 本项目迁移补充。配置 SSOT：[`project.yaml`](project.yaml)。
 
-| 文档 | 内容 |
-|---|---|
-| [DESIGN.md](DESIGN.md) | 详细设计：架构、目录结构、核心模块、协议约束、配置、里程碑、测试策略 |
-| [decisions/README.md](decisions/README.md) | 决策记录规则：何时写、格式、生命周期 |
-| [decisions/2026-10-18-sdk-first-architecture.md](decisions/2026-10-18-sdk-first-architecture.md) | 已接受：进程外 SDK 驱动架构（含放弃项与代价） |
-
-仓库级常驻规则见根目录 [AGENTS.md](../AGENTS.md)。
-
-## 约定
-
-- 只写"当前有效的决策"：过时文档直接修改或删除，不留多个历史版本。
-- 协议事实以 `@deepseek-ai/dsh-sdk-protocol` / `@deepseek-ai/dsh-sdk-client` 当前版本为准；协议行为变化时同步更新 DESIGN.md 对应章节。
-- 文档标题与链接使用相对路径，禁止引用 `.harness/` 之外的文档路径。
+- `workspace/changes/`：进行中的变更单元（`{type}-{slug}-{NNN}/`，proposal + tasks + verify + retro）
+- `workspace/archive/`：已归档变更（只读，`{YYYYMMDD}-` 前缀；M1–M6 的 retro 在此）
+- 知识落位：`docs/knowledge/`（架构 + 决策记录）· 规则落位：`docs/rules/`（charter + change-units）

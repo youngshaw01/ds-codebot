@@ -23,5 +23,12 @@ ds-codebot 要复用的 agent 能力（模型、工具、沙箱、审批、会�
 
 ## Verification
 
-- M1 验收（DESIGN.md §6）：CLI 连续对话 3 轮、Ctrl-C 触发安全 teardown、无 `DEEPSEEK_API_KEY` 时 e2e skip 而非误报失败。
-- 协议行为变化时本记录与 DESIGN.md §4.4 同步复核。
+- M1 验收（`docs/knowledge/architecture.md` §6）：CLI 连续对话 3 轮、Ctrl-C 触发安全 teardown、无 `DEEPSEEK_API_KEY` 时 e2e skip 而非误报失败。
+- 协议行为变化时本记录与 `docs/knowledge/architecture.md` §4.4 同步复核。
+
+## 变更记录
+
+| 日期 | 来源 change-id | 摘要 |
+| --- | --- | --- |
+| 2026-10-18 | bootstrap | 进程外 SDK 驱动架构决策 |
+| 2026-10-19 | docs-harness-contract-adoption-001 | 随 decisions/ 迁移至 docs/knowledge/decisions/ |
