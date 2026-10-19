@@ -71,7 +71,8 @@ maybe('live-vscode: 真实运行时 + 假 vscode API', () => {
       await mkdir(folderRoot, { recursive: true })
       await writeFile(join(folderRoot, 'README.md'), '# demo\n', 'utf8')
       const api = new FakeApi([{ uri: folderRoot, name: 'repo', index: 0 }])
-      const controller = new ChatController(pool, api, registry)
+      // snapshotDir 启用持久化基线 + 文件监听（M6 全路径）
+      const controller = new ChatController(pool, api, registry, { snapshotDir: join(dir, 'snapshots') })
       await controller.open()
 
       const panel = api.lastPanel
@@ -88,7 +89,7 @@ maybe('live-vscode: 真实运行时 + 假 vscode API', () => {
       assert.ok(proof, `期望 proof.txt 出现在 diff 中: ${diff.files.map((file) => file.path).join(',')}`)
       assert.equal(proof.kind, 'added')
 
-      controller.dispose()
+      await controller.dispose()
       await pool.close()
     } finally {
       await rm(dir, { recursive: true, force: true })

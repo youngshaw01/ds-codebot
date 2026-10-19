@@ -25,6 +25,7 @@
 | M3 飞书 | 群内 @bot 完成任务；同群上下文连续 | 代码与内部验证完成；真实租户联调待凭据（复盘见 [M3-review.md](M3-review.md)） | [M3-review.md](M3-review.md) |
 | M4 VSCode | 工作区会话绑定；diff 展示 | 已完成（复盘见 [M4-review.md](M4-review.md)，真实宿主联调待首跑） | [M4-review.md](M4-review.md) |
 | M5 增量快照 | 无变化轮次零新增读取；变更检测不回退 | 已完成（复盘见 [M5-review.md](M5-review.md)） | [M5-review.md](M5-review.md) |
+| M6 快照增强 | 持久化 / 内容哈希 / 文件监听三项依次完成 | 已完成（复盘见 [M6-review.md](M6-review.md)） | [M6-review.md](M6-review.md) |
 
 ## 防陷阱（来自 goal pitfalls）
 

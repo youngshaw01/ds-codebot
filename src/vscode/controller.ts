@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+import { join } from 'node:path'
 import type { AgentRuntime } from '../core/runtime.ts'
 import { SessionRegistry } from '../core/registry.ts'
 import { EventRouter, type UiEvent } from '../core/router.ts'
@@ -11,6 +13,15 @@ export type HostToWebview =
   | { type: 'turn-diff'; files: FileDiff[] }
   | { type: 'notice'; tone: 'info' | 'error'; text: string }
 
+export interface ChatControllerOptions {
+  /**
+   * 增量快照的持久化目录（M6.1/M6.3）：提供时每个 folder 的基线落盘到
+   * `<snapshotDir>/baseline-<sha1(uri)>.json.gz` 并启用文件监听；
+   * 省略则纯内存基线 + 纯 stat 判定（测试默认路径）。
+   */
+  snapshotDir?: string
+}
+
 /**
  * VS Code 聊天控制器（DESIGN.md M4）：
  * 工作区文件夹 ↔ session 绑定；prompt 前后快照工作区产出 turn diff；
@@ -19,6 +30,7 @@ export type HostToWebview =
  */
 export class ChatController {
   readonly #queues = new Map<string, Promise<void>>()
+  readonly #snapshotDir: string | undefined
 
   #panel: WebviewPanelLike | null = null
   #folder: WorkspaceFolderLike | null = null
@@ -29,7 +41,10 @@ export class ChatController {
     private readonly runtime: AgentRuntime,
     private readonly api: VscodeApi,
     private readonly registry: SessionRegistry,
-  ) {}
+    options?: ChatControllerOptions,
+  ) {
+    this.#snapshotDir = options?.snapshotDir
+  }
 
   /** 打开（或聚焦）聊天面板并绑定工作区；重复调用只聚焦。 */
   async open(folder?: WorkspaceFolderLike): Promise<void> {
@@ -112,21 +127,33 @@ export class ChatController {
     }
   }
 
-  /** 释放：退订通知、关闭面板、丢弃增量工作区。deactivate 与测试拆卸路径共用。 */
-  dispose(): void {
+  /** 释放：停监听、刷基线、退订、关面板。deactivate 与测试拆卸路径共用。 */
+  async dispose(): Promise<void> {
     this.#disposable?.()
     this.#disposable = null
+    for (const workspace of this.#workspaces.values()) {
+      await workspace.stop()
+      await workspace.flush()
+    }
     this.#workspaces.clear()
     this.#panel?.dispose()
     this.#panel = null
     this.#folder = null
   }
 
-  /** 每 folder 一个增量基线（M5）：turn 边界只读变更文件。 */
+  /** 每 folder 一个增量基线（M5/M6）：turn 边界只读变更文件；配置了
+   *  snapshotDir 时基线落盘并启用文件监听（M6.1/M6.3）。 */
   #workspaceFor(folder: WorkspaceFolderLike): IncrementalWorkspace {
     let workspace = this.#workspaces.get(folder.uri)
     if (!workspace) {
-      workspace = new IncrementalWorkspace(folder.uri)
+      workspace = new IncrementalWorkspace(folder.uri, {
+        ...(this.#snapshotDir !== undefined
+          ? {
+              baselineFile: join(this.#snapshotDir, `baseline-${createHash('sha1').update(folder.uri).digest('hex')}.json.gz`),
+              watch: true,
+            }
+          : {}),
+      })
       this.#workspaces.set(folder.uri, workspace)
     }
     return workspace

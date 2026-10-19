@@ -31,7 +31,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
   // 会话绑定存放在扩展的 globalStorage（随 VS Code 账户/机器持久）
   const registry = new SessionRegistry(vscode.Uri.joinPath(context.globalStorageUri, 'ds-codebot-registry.json').fsPath)
-  controller = new ChatController(pool, toApi(), registry)
+  // 增量快照基线落盘到 globalStorage，并启用文件监听
+  controller = new ChatController(pool, toApi(), registry, {
+    snapshotDir: vscode.Uri.joinPath(context.globalStorageUri, 'workspace-baselines').fsPath,
+  })
 
   context.subscriptions.push(
     vscode.commands.registerCommand('ds-codebot.openChat', () => {
@@ -41,7 +44,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 }
 
 export async function deactivate(): Promise<void> {
-  controller?.dispose()
+  await controller?.dispose()
   await pool?.close()
   controller = null
   pool = null

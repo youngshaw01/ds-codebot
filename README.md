@@ -53,7 +53,7 @@ npm run build:vscode    # esbuild 打包到 dist-vscode/（单文件 CJS + 扩�
 code --extensionDevelopmentPath=dist-vscode   # 扩展开发宿主中加载
 ```
 
-命令面板执行 `ds-codebot: 打开编码助手`：绑定当前工作区文件夹 ↔ session，对话与工具调用实时渲染，每轮结束后推送工作区 `turn-diff`（宿主侧**增量**快照 + 行差分：无变化的轮次零新增文件读取）。输入框支持 `/cwd <目录>`。注意：审批交互无法经 SDK wire 传递，权限须在 `ds-codebot.config.json` 的 patch 层预置。
+命令面板执行 `ds-codebot: 打开编码助手`：绑定当前工作区文件夹 ↔ session，对话与工具调用实时渲染，每轮结束后推送工作区 `turn-diff`（宿主侧**增量**快照 + 行差分 + 内容哈希 + 文件监听；基线持久化到扩展 globalStorage，无变化的轮次零新增文件读取）。输入框支持 `/cwd <目录>`。注意：审批交互无法经 SDK wire 传递，权限须在 `ds-codebot.config.json` 的 patch 层预置。
 
 ### 飞书 bot
 
